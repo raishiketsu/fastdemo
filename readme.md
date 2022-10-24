@@ -10,9 +10,9 @@ RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 COPY ./app /app
 ```
 
-### app directory 
+### Create app directory 
 
-### main.py
+### Create main.py
 
 ```
 from fastapi import FastAPI
