@@ -1,4 +1,7 @@
-### Create Dockerfile
+### 1.Create Dockerfile
+```
+vi Dockerfile
+```
 
 ```
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9
@@ -10,9 +13,24 @@ RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 COPY ./app /app
 ```
 
-### Create app directory 
+### 2.Create requirements.txt
+```
+vi requirements.txt
+```
+```
+fastapi
+```
 
-### Create main.py
+### 3.Create app directory
+```
+mkdir app
+```
+
+### 4.Create main.py
+```
+cd app
+vi main.py
+```
 
 ```
 from fastapi import FastAPI
@@ -30,12 +48,9 @@ def read_item(item_id: int, q: str = None):
     return {"item_id": item_id, "q": q}
 ```
 
-### Create requirements.txt
-```
-fastapi
-```
 
-### Directory
+
+### 5.Directory
 ```
 .
 ├── app
@@ -44,24 +59,59 @@ fastapi
 └── requirements.txt
 ```
 
-### Build
+### 6.Docker Build
+※Dockerfileと同じディレクトリで実行し、
+イメージを作成
+
 ```
 docker build -t myimage .
 ```
-### Run
+### 6.Docker Run
+コンテナを起動
 ```
 docker run -d --name mycontainer -p 80:80 myimage
 curl http://localhost
 ```
-### Push
+### 7.Push
+＊＊＊＊＊＊の部分はコンテナレジストリに置き換えます
 ```
 docker login
 
-docker tag myimage rais39/fastdemo:v1.2
-docker push rais39/fastdemo:v1.2
+docker tag myimage ＊＊＊＊＊＊/fastdemo:v1.0
+docker push ＊＊＊＊＊＊/fastdemo:v1.0
 ```
 
+---
+
+### Create YAML
+```
+apiVersion: managed.msp.sbopsv/v1alpha1
+kind: Application
+metadata:
+  name: fastdemo
+  namespace: staging
+spec:
+  chart:
+    name: basic-deployment
+    version: 0.4.x
+  settings:
+    image:
+      repository: rais39/fastdemo
+      pullPolicy: IfNotPresent
+      tag: "v1.0"
+    service:
+      domain: fastdemo.sb-presales.com
+      serviceType: LoadBalancer
+      ports:
+      - name: fastdemo
+        containerPort: 80
+        servicePort: 80
+```
+
+---
+
 ### Update
+main.pyを更新して、イメージをアップデートし新しいタグv1.1を付けます。
 ```
 from typing import Union
 
@@ -92,27 +142,4 @@ def update_item(item_id: int, item: Item):
     return {"item_name": item.name, "item_id": item_id}
 ```
 
-### Create YAML
-```
-apiVersion: managed.msp.sbopsv/v1alpha1
-kind: Application
-metadata:
-  name: fastdemo
-  namespace: staging
-spec:
-  chart:
-    name: basic-deployment
-    version: 0.4.x
-  settings:
-    image:
-      repository: rais39/fastdemo
-      pullPolicy: IfNotPresent
-      tag: "v1.3"
-    service:
-      domain: fastdemo.sb-presales.com
-      serviceType: LoadBalancer
-      ports:
-      - name: fastdemo
-        containerPort: 80
-        servicePort: 80
-```
+
