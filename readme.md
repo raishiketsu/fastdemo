@@ -1,6 +1,4 @@
-https://github.com/tiangolo/uvicorn-gunicorn-fastapi-docker#build-your-image
-
-### Dockerfile
+### Create Dockerfile
 
 ```
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9
@@ -92,4 +90,29 @@ def read_item(item_id: int, q: Union[str, None] = None):
 @app.put("/items/{item_id}")
 def update_item(item_id: int, item: Item):
     return {"item_name": item.name, "item_id": item_id}
+```
+
+### Create YAML
+```
+apiVersion: managed.msp.sbopsv/v1alpha1
+kind: Application
+metadata:
+  name: fastdemo
+  namespace: staging
+spec:
+  chart:
+    name: basic-deployment
+    version: 0.4.x
+  settings:
+    image:
+      repository: rais39/fastdemo
+      pullPolicy: IfNotPresent
+      tag: "v1.3"
+    service:
+      domain: fastdemo.sb-presales.com
+      serviceType: LoadBalancer
+      ports:
+      - name: fastdemo
+        containerPort: 80
+        servicePort: 80
 ```
